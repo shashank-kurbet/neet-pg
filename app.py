@@ -245,7 +245,7 @@ if page=="Quiz":
         st.session_state.last_total = len(quiz)
         
         # force rerun so inline results appear immediately
-        st.rerun() # <-- FIXED LINE
+        st.rerun() 
         
     # NEW BLOCK: Display the score only if the quiz has been submitted
     if st.session_state.submitted:
@@ -273,11 +273,32 @@ if page=="Quiz":
                 opts=[q.get("opa",""),q.get("opb",""),q.get("opc",""),q.get("opd","")]
                 opts=[o for o in opts if o and str(o).strip()!=""]
                 st.session_state[f"ans_{q['id']}"] = opts[0] if opts else None
-            st.rerun() # <-- FIXED LINE
+            st.rerun() 
 
 # HISTORY
 elif page=="History":
     st.title("📜 Past Attempts (click to expand)")
+    
+    # --- Data Management: Download History ---
+    if os.path.exists(HISTORY_FILE):
+        st.subheader("Data Management")
+        history_text = ""
+        try:
+             with open(HISTORY_FILE,"r",encoding="utf-8") as f:
+                history_text = f.read()
+             st.download_button(
+                 label="💾 Download Quiz History (JSON)",
+                 data=history_text,
+                 file_name="neet_pg_quiz_history.json",
+                 mime="application/json",
+                 help="Download your quiz history for local backup or transfer."
+             )
+        except Exception:
+            st.warning("Could not read history file for download.")
+    
+    st.markdown("---")
+    # ------------------------------------
+
     if not history:
         st.info("No history yet.")
     else:
