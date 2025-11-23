@@ -346,10 +346,10 @@ elif page=="Progress":
             
             # 5. Create the chart using Quiz Attempt # on the X-axis
             try:
-                # *** UPDATED CHART CONFIGURATION ***
+                # *** UPDATED CHART CONFIGURATION: Use Nominal (:N) for discrete labels ***
                 chart = alt.Chart(df).mark_line(point=True).encode(
-                    # Added axis formatting to force integer labels (format='d') and step by 1
-                    x=alt.X("Quiz Attempt #:Q", title="Quiz Attempt #", axis=alt.Axis(tickMinStep=1, format='d')), 
+                    # Changing from :Q to :N forces the axis to use discrete category labels 
+                    x=alt.X("Quiz Attempt #:N", title="Quiz Attempt #"), 
                     y=alt.Y("Percent Score:Q", title="Score (%)")
                 ).properties(
                     title="Quiz Performance by Attempt Number",
