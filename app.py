@@ -346,8 +346,10 @@ elif page=="Progress":
             
             # 5. Create the chart using Quiz Attempt # on the X-axis
             try:
+                # *** UPDATED CHART CONFIGURATION ***
                 chart = alt.Chart(df).mark_line(point=True).encode(
-                    x=alt.X("Quiz Attempt #:Q", title="Quiz Attempt #"), 
+                    # Added axis formatting to force integer labels (format='d') and step by 1
+                    x=alt.X("Quiz Attempt #:Q", title="Quiz Attempt #", axis=alt.Axis(tickMinStep=1, format='d')), 
                     y=alt.Y("Percent Score:Q", title="Score (%)")
                 ).properties(
                     title="Quiz Performance by Attempt Number",
