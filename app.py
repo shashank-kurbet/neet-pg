@@ -326,20 +326,45 @@ elif page=="Progress":
         st.info("No progress yet.")
     else:
         df = pd.DataFrame(history)
-        if "date" in df.columns:
+        
+        # 1. Ensure score and total columns exist
+        if "total" in df.columns and "score" in df.columns:
+            # 2. Calculate percentage
+            df["Percent Score"] = (df["score"]/df["total"]) * 100
+            
+            # 3. Sort by date (if available) to ensure chronological numbering
+            if "date" in df.columns:
+                try:
+                    df["date"] = pd.to_datetime(df["date"])
+                    df = df.sort_values("date").reset_index(drop=True)
+                except Exception:
+                    # If date parsing fails, rely on existing order
+                    pass 
+                    
+            # 4. Add the sequential quiz attempt number
+            df["Quiz Attempt #"] = range(1, len(df) + 1)
+            
+            # 5. Create the chart using Quiz Attempt # on the X-axis
             try:
-                df["date"] = pd.to_datetime(df["date"])
-                df = df.sort_values("date")
-                if "total" in df.columns and "score" in df.columns:
-                    df["percent"] = (df["score"]/df["total"]) * 100
-                elif "score" in df.columns:
-                    df["percent"] = df["score"]
-                grouped = df.groupby(df["date"].dt.date).agg({"percent":"mean"}).reset_index().sort_values("date")
-                chart = alt.Chart(grouped).mark_line(point=True).encode(x=alt.X("date:T",title="Date"), y=alt.Y("percent:Q",title="Score (%)")).properties(width=700,height=300)
+                chart = alt.Chart(df).mark_line(point=True).encode(
+                    x=alt.X("Quiz Attempt #:Q", title="Quiz Attempt #"), 
+                    y=alt.Y("Percent Score:Q", title="Score (%)")
+                ).properties(
+                    title="Quiz Performance by Attempt Number",
+                    width=700, 
+                    height=300
+                )
                 st.altair_chart(chart, use_container_width=True)
-                st.write(grouped.set_index("date"))
+                
+                # Show the underlying data table (only relevant columns)
+                st.subheader("Attempt Details")
+                display_cols = ["date", "score", "total", "Percent Score", "Quiz Attempt #"]
+                # Filter for existing columns to avoid errors
+                filtered_cols = [col for col in display_cols if col in df.columns]
+                st.dataframe(df[filtered_cols].rename(columns={"date": "Date", "score": "Correct", "total": "Total"}), use_container_width=True)
+
             except Exception as e:
                 st.error(f"Could not build chart: {e}")
                 st.line_chart(df["score"])
         else:
-            st.line_chart(pd.DataFrame(history)["score"])
+            st.warning("History data is missing 'score' or 'total' columns required for progress tracking.")
