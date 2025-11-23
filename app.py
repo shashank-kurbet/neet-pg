@@ -245,7 +245,7 @@ if page=="Quiz":
         st.session_state.last_total = len(quiz)
         
         # force rerun so inline results appear immediately
-        st.experimental_rerun()
+        st.rerun() # <-- FIXED LINE
         
     # NEW BLOCK: Display the score only if the quiz has been submitted
     if st.session_state.submitted:
@@ -273,7 +273,7 @@ if page=="Quiz":
                 opts=[q.get("opa",""),q.get("opb",""),q.get("opc",""),q.get("opd","")]
                 opts=[o for o in opts if o and str(o).strip()!=""]
                 st.session_state[f"ans_{q['id']}"] = opts[0] if opts else None
-            st.experimental_rerun()
+            st.rerun() # <-- FIXED LINE
 
 # HISTORY
 elif page=="History":
